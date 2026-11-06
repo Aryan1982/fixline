@@ -1,0 +1,8 @@
+{
+  "name": "shopkit",
+  "version": "1.4.0",
+  "private": true,
+  "description": "Order, discount, refund and export logic for a small online shop. Fixline's demo codebase: it ships with real bugs on purpose.",
+  "type": "module",
+  "scripts": { "test": "node --test" }
+}
