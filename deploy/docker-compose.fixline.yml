@@ -1,0 +1,7 @@
+# Fixline's tweaks on top of Switch's standalone stack.
+services:
+  mattermost:
+    environment:
+      # Hides the "email notifications have not been configured" banner, which
+      # covers the top of every screen in a local demo.
+      MM_EMAILSETTINGS_ENABLEPREVIEWMODEBANNER: "false"

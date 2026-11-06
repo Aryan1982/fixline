@@ -1,0 +1,10 @@
+# Apple Silicon override: run Mattermost natively instead of emulated.
+# The Makefile adds this file automatically when `uname -m` is arm64.
+services:
+  mattermost:
+    image: fixline/mattermost-team:11.9.0-arm64
+    platform: linux/arm64
+    build:
+      context: ./mattermost-arm64
+      args:
+        MM_VERSION: "11.9.0"
