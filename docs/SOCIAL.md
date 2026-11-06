@@ -34,7 +34,7 @@ Sam from support tried to press Approve. Switch ignored him. Priya pressed it, a
 5/
 3 commands: make up, make setup, make crew. Everything runs on your laptop, and Mattermost comes in the box.
 
-Repo: <repo URL>
+Repo: https://github.com/Aryan1982/fixline
 Built for #FlipTheSwitch with @WeMakeDevs × @DevToolsAcad
 
 ## LinkedIn
@@ -52,6 +52,6 @@ What makes it trustworthy isn't the models, it's the rules around them:
 
 In my runs, report to merge took 3 to 4 minutes.
 
-Built on Switch (open-source infrastructure for putting agents in team chat). Code and a 60-second demo: <repo URL>
+Built on Switch (open-source infrastructure for putting agents in team chat). Code and a 60-second demo: https://github.com/Aryan1982/fixline
 
 #HowISwitch #AIagents #DevTools

@@ -149,7 +149,7 @@ The models were the easy part. The work went into rules that don't depend on a m
 ## Try it
 
 ```sh
-git clone <this repo> && cd fixline
+git clone https://github.com/Aryan1982/fixline && cd fixline
 make up && make setup && make crew
 make demo          # in another terminal: Sam reports two problems, Priya approves
 ```
