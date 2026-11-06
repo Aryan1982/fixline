@@ -6,6 +6,8 @@ Fixline puts a five-agent bug-fixing crew into your team chat with [Switch](http
 
 Built for the WeMakeDevs × DevTools Academy **Flip the Switch** hackathon, Track 1: Best Business Workflow.
 
+**Site:** [fixline-iota.vercel.app](https://fixline-iota.vercel.app) · **Build notes:** [fixline-iota.vercel.app/blog](https://fixline-iota.vercel.app/blog/)
+
 ![A real run at 4× speed: Sam's report, the crew's hand-offs, Priya's approval, the merge](docs/media/demo-4x.gif)
 
 *A real, unedited run at 4× speed ([MP4](docs/media/demo-4x.mp4), [full-length recording](docs/media/demo-raw.mp4)). The report went in at 13:20:07 and was merged at 13:23:14.*

@@ -16,6 +16,10 @@ The result is [Fixline](../README.md). Sam from support types *"a customer retur
 
 Sam tried to press Approve too. Switch ignored him.
 
+![The approval card, Sam's ignored answer, Priya's approval and the merge](https://raw.githubusercontent.com/Aryan1982/fixline/main/site/img/approve.png)
+
+Here's the whole run at 4× speed: [demo video](https://raw.githubusercontent.com/Aryan1982/fixline/main/docs/media/demo-4x.mp4).
+
 This post shows how that works on [Switch](https://github.com/sandbox-quantum/switch), and the pitfalls I hit along the way, so your first day goes faster than mine.
 
 ## What Switch gives you
@@ -120,6 +124,8 @@ await ci.op("create_room", {
 
 Each agent then calls `connect_to_room` and `assume_role`. Room documents come from `create_room_document`. Only the agent that created a document can update it, so let the agent that owns a document create it: triage owns `known-issues`, CI owns `fix-ledger`.
 
+![The five roles in the Switch Gateway, each held by its agent](https://raw.githubusercontent.com/Aryan1982/fixline/main/docs/img/gateway-roles.png)
+
 ## Step 5: let a person press the button
 
 This is the part I like best. CI opens a native approval card:
@@ -145,6 +151,8 @@ The models were the easy part. The work went into rules that don't depend on a m
 - **The test is locked.** CI records the repro commit in the thread. When the fix comes back, it diffs the branch against that commit, and if the test file changed, the fix is rejected. (Fixers love weakening the test.)
 - **Different models check each other.** In one run Codex sent a CSV fix back because `String(value)` turned `null` cells into the text `"null"`. Claude Code fixed it on the next pass.
 - **The thread is the ticket.** No agent keeps ticket state in memory. Each one rebuilds the ticket by calling `read_context` on its thread, so a person reading the same thread sees exactly what the agents saw.
+
+![CI confirms the bug and locks the repro test](https://raw.githubusercontent.com/Aryan1982/fixline/main/site/img/repro.png)
 
 ## Try it
 

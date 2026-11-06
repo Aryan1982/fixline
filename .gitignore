@@ -3,3 +3,4 @@ deploy/.env
 .fixline/
 workspace/
 .DS_Store
+.vercel/

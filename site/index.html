@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fixline: support reports in, approved fixes out</title>
+  <meta name="description" content="Claude Code and Codex in your support channel, coordinated by Switch. They reproduce, fix and review each customer bug; a person approves every merge.">
+  <meta property="og:title" content="Fixline: support reports in, approved fixes out">
+  <meta property="og:description" content="A customer complaint typed in chat became a tested, reviewed, approved merge in 3.2 minutes. Built on Switch.">
+  <meta property="og:image" content="https://fixline-iota.vercel.app/img/og.png">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%230a0a0a'/><path d='M9 17l5 5 9-12' stroke='%23ff5a1f' stroke-width='3.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header class="nav wrap">
+    <a class="brand" href="/">Fixline</a>
+    <nav>
+      <a href="#demo">Demo</a>
+      <a href="#how">How it works</a>
+      <a href="/blog/">Build notes</a>
+      <a class="nav-cta" href="https://github.com/Aryan1982/fixline">GitHub</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero wrap">
+      <p class="eyebrow">Built on Switch · Flip the Switch hackathon</p>
+      <h1>Support reports in.<br>Approved fixes out.</h1>
+      <p class="lede">Fixline puts Claude Code and Codex in your support channel. They reproduce, fix and review each customer bug, and nothing merges until a person presses Approve.</p>
+      <div class="cta-row">
+        <a class="btn" href="https://github.com/Aryan1982/fixline" data-cta="hero">Get Fixline on GitHub, free</a>
+        <a class="link" href="#demo">Watch the 60-second run →</a>
+      </div>
+      <p class="trust">MIT licensed · runs on your laptop · <code>make up</code> · <code>make setup</code> · <code>make crew</code></p>
+    </section>
+
+    <section class="proof wrap" aria-label="Measured results">
+      <div><strong>3.2 min</strong><span>from Sam's complaint to a merged fix, in a real run</span></div>
+      <div><strong>1 approval</strong><span>the only thing the engineering lead had to do</span></div>
+      <div><strong>0 tickets</strong><span>for a duplicate: triage answered from the known-issues doc</span></div>
+    </section>
+
+    <section id="demo" class="demo wrap">
+      <div class="frame video">
+        <video controls muted playsinline preload="metadata" poster="/img/poster.jpg" width="1440" height="788">
+          <source src="/media/demo-4x.mp4" type="video/mp4">
+        </video>
+      </div>
+      <p class="caption">A real, unedited run at 4× speed. Sam reports a refund that came out a cent short. The crew files FX-1, proves the bug, fixes it, reviews it, and waits for Priya. Sam tries to approve too; Switch ignores him.</p>
+    </section>
+
+    <section id="how" class="how wrap">
+      <h2>Three steps, and only two of them are yours</h2>
+      <ol class="steps">
+        <li><span>01</span><h3>Type the complaint</h3><p>Sam from support writes in plain English, with no @-mention. Triage is the room's main agent, so every message reaches it.</p></li>
+        <li><span>02</span><h3>Watch the crew hand off</h3><p>Repro, CI, Fixer and Reviewer pass the ticket along in one thread, each addressed by its Switch room role.</p></li>
+        <li><span>03</span><h3>Press Approve</h3><p>The engineering lead gets a Switch approval card. One click merges; triage tells support what to say to the customer.</p></li>
+      </ol>
+    </section>
+
+    <section class="features wrap">
+      <article class="feature">
+        <div class="copy">
+          <h3>Triage files a ticket a developer could act on</h3>
+          <p>Claude Code reads the code, finds the line responsible, and writes up the expected and actual numbers. Duplicates never get this far: triage checks the room's <code>known-issues</code> document first and replies with the workaround.</p>
+        </div>
+        <img class="frame" src="/img/triage.png" width="1125" height="530" alt="Triage replies to Sam and files FX-1 with summary, steps, expected, actual and suspected code" loading="lazy">
+      </article>
+
+      <article class="feature flip">
+        <div class="copy">
+          <h3>No fix without a failing test, and the test is locked</h3>
+          <p>Codex writes the reproduction. CI, which is plain code with no model, watches it fail and records the commit. If the fixer edits that test later, CI rejects the fix.</p>
+        </div>
+        <img class="frame" src="/img/repro.png" width="1125" height="215" alt="CI Gate confirms the bug: 3997 !== 3998, and locks the repro test" loading="lazy">
+      </article>
+
+      <article class="feature">
+        <div class="copy">
+          <h3>A different model reviews, and a person approves</h3>
+          <p>Code written by Claude Code is reviewed by Codex. In one run Codex sent a CSV fix back for turning empty cells into the text "null". Then CI raises a native Switch approval card that only the lead's answer can close.</p>
+        </div>
+        <img class="frame" src="/img/approve.png" width="1125" height="405" alt="Approval card chosen by Priya Shah; Sam's answer ignored; merged in 3.7 minutes" loading="lazy">
+      </article>
+
+      <article class="feature flip">
+        <div class="copy">
+          <h3>Support hears how it ended</h3>
+          <p>Triage explains the bug to Sam in plain words and drafts a reply he can paste to the customer. Every merge goes into the <code>fix-ledger</code> room document, with the time it took and who approved it.</p>
+        </div>
+        <img class="frame" src="/img/customer.png" width="1125" height="315" alt="Triage tells Sam what went wrong and drafts a customer reply" loading="lazy">
+      </article>
+    </section>
+
+    <section class="switch wrap">
+      <div class="copy narrow">
+        <h2>Switch is the whole wiring</h2>
+        <p>Every hand-off is a Switch message addressed to a room role. No agent keeps ticket state in memory; each one rebuilds the ticket by reading its thread. The room carries the roles, the instructions, both documents, the approval cards and the rule that only the lead may approve.</p>
+        <ul class="facts">
+          <li><b>Roles</b> triage, repro, fixer, reviewer and ci, each held by one agent</li>
+          <li><b>Main agent</b> so support never types an @-mention</li>
+          <li><b>Room documents</b> known-issues for dedup, fix-ledger for the audit trail</li>
+          <li><b>Approval cards</b> plus an owner-only addressing policy on @ci</li>
+          <li><b>Agent protocol</b> all five agents are WebSocket + HTTP clients</li>
+        </ul>
+      </div>
+      <img class="frame" src="/img/roles.png" width="2880" height="1576" alt="Roles in the Switch Gateway, each held by its Fixline agent" loading="lazy">
+    </section>
+
+    <section class="faq wrap">
+      <h2>Questions</h2>
+      <details><summary>Do I need Slack or a company workspace?</summary><p>No. The stack includes Mattermost, so everything runs on your laptop. Switch also bridges Slack, Teams, Discord and Telegram; Fixline was tested on Mattermost.</p></details>
+      <details><summary>Which agents does it use?</summary><p>The Claude Code and Codex CLIs you already have, run headless inside a separate git worktree for each ticket. The CI gate is ordinary code.</p></details>
+      <details><summary>Where does my code go?</summary><p>To Anthropic and OpenAI through their own CLIs, exactly as when you use them in a terminal. Switch, Mattermost and git all run locally in Docker and on your disk.</p></details>
+      <details><summary>What if a fix is wrong?</summary><p>It has to pass the locked repro test and the whole suite, then a second model's review. After that the lead can press Decline, and the branch is parked instead of merged.</p></details>
+      <details><summary>How long does setup take?</summary><p>One <code>make up</code> (the first run pulls images), one <code>make setup</code> (about 30 seconds), then <code>make crew</code>. You need Docker, Node 20+ and both CLIs signed in.</p></details>
+    </section>
+
+    <section class="final wrap">
+      <h2>Give your support channel a crew.</h2>
+      <a class="btn" href="https://github.com/Aryan1982/fixline" data-cta="footer">Get Fixline on GitHub, free</a>
+      <p class="trust">Open source under MIT. Built on <a href="https://github.com/sandbox-quantum/switch">Switch</a>.</p>
+    </section>
+  </main>
+
+  <footer class="wrap foot">
+    <span>Fixline · built for Flip the Switch by WeMakeDevs × DevTools Academy</span>
+    <a href="/blog/">Build notes</a>
+  </footer>
+</body>
+</html>

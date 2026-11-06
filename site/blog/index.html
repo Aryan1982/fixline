@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Claude Code and Codex in a support channel, checking each other's work</title>
+  <meta name="description" content="How Fixline was built on Switch's agent protocol: rooms, roles, approval cards, addressing policies, and six pitfalls for first-time Switch users.">
+  <meta property="og:image" content="https://fixline-iota.vercel.app/img/og.png">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header class="nav wrap">
+    <a class="brand" href="/">Fixline</a>
+    <nav><a href="/#demo">Demo</a><a class="nav-cta" href="https://github.com/Aryan1982/fixline">GitHub</a></nav>
+  </header>
+  <main class="wrap post">
+<h1>I put Claude Code and Codex in a support channel and made them check each other&#39;s work</h1>
+<p><em>How I built Fixline on Switch&#39;s agent protocol, and the six things I wish I&#39;d known on day one.</em></p>
+<p>Support teams hear about bugs first and can&#39;t fix them. Engineers can fix them, but every ticket costs a context switch: read the retelling, reproduce it, fix it, get it reviewed, merge it, then remember to tell support. I wanted to see how much of that loop AI agents could run by themselves if they worked <em>in the support channel</em>, next to the people, instead of in someone&#39;s terminal.</p>
+<p>The result is <a href="https://github.com/Aryan1982/fixline">Fixline</a>. Sam from support types <em>&quot;a customer returned 2 mugs at $19.99 and was refunded $39.97&quot;</em> into Mattermost. About four minutes later:</p>
+<ol>
+<li><strong>Triage</strong> (Claude Code) has checked the room&#39;s known-issues document, found the bug in <code>src/refund.js</code>, and filed ticket FX-1.</li>
+<li><strong>Repro</strong> (Codex) has written a failing test.</li>
+<li><strong>CI</strong> (plain code, no model) has watched that test fail and <em>locked</em> it.</li>
+<li><strong>Fixer</strong> (Claude Code) has fixed the root cause without touching the locked test.</li>
+<li><strong>Reviewer</strong> (Codex, a different model than the one that wrote the fix) has approved it.</li>
+<li>CI has posted an approval card. Priya, the engineering lead, pressed <strong>Approve</strong>, and the fix is merged.</li>
+<li>Triage has told Sam what went wrong, and drafted a reply he can paste to the customer.</li>
+</ol>
+<p>Sam tried to press Approve too. Switch ignored him.</p>
+<p><img src="https://raw.githubusercontent.com/Aryan1982/fixline/main/site/img/approve.png" alt="The approval card, Sam's ignored answer, Priya's approval and the merge"></p>
+<p>Here&#39;s the whole run at 4× speed: <a href="https://raw.githubusercontent.com/Aryan1982/fixline/main/docs/media/demo-4x.mp4">demo video</a>.</p>
+<p>This post shows how that works on <a href="https://github.com/sandbox-quantum/switch">Switch</a>, and the pitfalls I hit along the way, so your first day goes faster than mine.</p>
+<h2>What Switch gives you</h2>
+<p>Switch connects AI agents to team chat. Every chat channel becomes a <strong>room</strong>, a shared log that people and agents both read from. Agents join it like any other member, with their own name and avatar. On top of the log, a room carries:</p>
+<ul>
+<li><strong>Instructions</strong> that every agent sees when it connects.</li>
+<li><strong>Roles</strong>: named jobs such as <code>reviewer</code>. Address <code>@reviewer</code> and whichever agent holds that role gets the message.</li>
+<li><strong>Documents</strong>: shared text every member can read, such as a list of known issues.</li>
+<li><strong>Approval cards</strong>: an agent asks permission, the chat shows buttons, and Switch records who answered.</li>
+<li><strong>Addressing policies</strong>: who is allowed to give an agent instructions.</li>
+</ul>
+<p>Switch ships no agents and no models. You bring both. Switch Console, the desktop app, can run Claude Code, Codex or OpenCode for you. For Fixline I went one level down and wrote all five agents as clients of the <a href="https://docs.switchagents.ai/switch-rooms/internals/agent-protocol">agent protocol</a>: events arrive over a WebSocket, and everything the agent does is an HTTP call. That let me include an agent with no model at all (the CI gate), and it lets anyone reproduce the whole thing with three <code>make</code> commands.</p>
+<h2>Step 1: run Switch on your laptop</h2>
+<p>Switch publishes a standalone Docker Compose stack: Postgres, the Switch server, Mattermost as a free chat app, the Gateway admin UI, and a setup container that seeds an admin, a Mattermost user and the Mattermost bridge.</p>
+<pre><code class="language-sh">cp .env.example .env
+bash generate-env-secrets.sh .env local     # fills every secret with random values
+# set SWITCH_VERSION to a release, e.g. 0.31.0 (there&#39;s deliberately no default)
+docker compose -f docker-compose.yml --env-file .env --profile collab --profile gateway up -d
+curl localhost:8000/health                  # {&quot;status&quot;:&quot;ok&quot;}
+</code></pre>
+<blockquote>
+<p><strong>Pitfall 1: Mattermost on Apple Silicon.</strong> Mattermost publishes its Docker image for amd64 only. Under Colima&#39;s QEMU emulation it ran for a few minutes and then crashed with <code>fatal error: fault</code> inside <code>compress/flate</code>, and Switch started logging Mattermost timeouts. Mattermost does publish a native <code>linux-arm64</code> server tarball, so Fixline builds a ten-line image from it (<a href="https://github.com/Aryan1982/fixline/blob/main/deploy/mattermost-arm64/Dockerfile"><code>deploy/mattermost-arm64/Dockerfile</code></a>) and the Makefile swaps it in on arm64. After that it never crashed again. Enabling Rosetta in Colima probably works too, but it restarts the VM and every container in it.</p>
+</blockquote>
+<blockquote>
+<p><strong>Pitfall 2: <code>!assign-agent</code> silently does nothing.</strong> Follow-ups and main agents sit behind a feature flag on a server you run yourself. Add <code>FEATURE_FLAGS_ENABLED=follow_the_conversation</code> to <code>.env</code>. With the flag on, the command answers <em>&quot;From now on, every message here goes to …&quot;</em>.</p>
+</blockquote>
+<h2>Step 2: register an agent</h2>
+<p>Registration needs a <em>registration</em> key, which you create in the Gateway under <strong>API Keys</strong> or with one call as the admin:</p>
+<pre><code class="language-js">const login = await fetch(`${base}/gateway/auth/login`, { method: &quot;POST&quot;, headers: { &quot;content-type&quot;: &quot;application/json&quot; },
+  body: JSON.stringify({ email, password }) });
+const cookie = login.headers.getSetCookie().map((c) =&gt; c.split(&quot;;&quot;)[0]).join(&quot;; &quot;);
+const { key } = await (await fetch(`${base}/gateway/api-keys`, { method: &quot;POST&quot;,
+  headers: { cookie, &quot;content-type&quot;: &quot;application/json&quot; }, body: JSON.stringify({ label: &quot;my-crew&quot; }) })).json();
+
+const agent = await (await fetch(`${base}/agents`, { method: &quot;POST&quot;,
+  headers: { authorization: `Bearer ${key}`, &quot;content-type&quot;: &quot;application/json&quot; },
+  body: JSON.stringify({
+    name: &quot;fixline-ci&quot;, display_name: &quot;CI Gate&quot;, description: &quot;Runs tests and gates merges&quot;,
+    connector_type: &quot;fixline&quot;,
+    integration_profile: { connection_model: &quot;always_on&quot;, message_exchange: true,
+      pre_invocation_mediation: [], post_invocation_mediation: [], event_reporting: [] },
+  }) })).json();
+// agent = { id, api_key }: the key is shown once, so store it
+</code></pre>
+<p>The person who created the registration key owns the agent. In the local stack that&#39;s the seeded admin, whose account is linked to the seeded Mattermost user, so that Mattermost user is the agent&#39;s owner in chat.</p>
+<blockquote>
+<p><strong>Pitfall 3: who an agent listens to is the owner&#39;s call, not the agent&#39;s.</strong> The docs show an agent widening its own audience with the <code>update_agent_detail</code> operation. On 0.31.0 that returns <code>403: An agent can&#39;t change its own settings</code>. The owner sets it through the Gateway instead: <code>PUT /gateway/agents/{id}/addressing-policy</code>. <code>{&quot;policy&quot;: null}</code> opens the agent to anyone in the room. Fixline uses an owner-only rule for the CI gate:</p>
+<pre><code class="language-json">{ &quot;policy&quot;: { &quot;rules&quot;: [{ &quot;users&quot;: [], &quot;agents&quot;: [], &quot;owner&quot;: true, &quot;owner_agents&quot;: true }] } }
+</code></pre>
+<p>That one rule is why Sam can&#39;t approve merges. Approval cards can only be answered by people the agent takes instructions from, so Switch drops his answer before CI ever sees it.</p>
+</blockquote>
+<h2>Step 3: hold the connection</h2>
+<pre><code class="language-js">const ws = new WebSocket(`${wsBase}/agents/${id}/connection/ws?connection_id=${connectionId}&amp;rooms=${roomId}`,
+  { headers: { authorization: `Bearer ${apiKey}` } });   // the `ws` package; browsers can&#39;t set this header
+ws.on(&quot;message&quot;, (raw) =&gt; {
+  const frame = JSON.parse(raw);
+  if (frame.type === &quot;ping&quot;) return ws.send(JSON.stringify({ type: &quot;pong&quot;, cursor }));  // always first
+  if (typeof frame.id === &quot;number&quot;) cursor = Math.max(cursor, frame.id);
+  if (frame.event === &quot;message&quot; &amp;&amp; frame.data.payload.addressed) handle(frame.data);
+});
+</code></pre>
+<p>Four rules cover almost everything:</p>
+<ul>
+<li><strong>Answer pings first.</strong> The server pings every 2 seconds and drops you after 6 seconds of silence. Never let a slow model call sit between a ping and its pong.</li>
+<li><strong>Keep one <code>connection_id</code> for the agent&#39;s lifetime</strong> and reconnect with it, plus <code>start_from=&lt;cursor&gt;</code>, so missed events replay.</li>
+<li><strong>Act only on <code>payload.addressed</code>.</strong> By default you receive everything in the room.</li>
+<li><strong>Claim the room when you open the socket</strong> (<code>rooms=</code> in the URL), not afterwards, or catch-up events are skipped.</li>
+</ul>
+<blockquote>
+<p><strong>Pitfall 4: the connection-id header before the socket is open.</strong> Operations take an optional <code>X-Switch-Connection-Id</code> header that binds the call to your room. Send it before the socket&#39;s <code>connection_state</code> frame arrives and you get <code>409: connection … is not open</code>. Send it only once you&#39;re connected.</p>
+</blockquote>
+<blockquote>
+<p><strong>Pitfall 5: two kinds of participant id.</strong> <code>list_participants</code> returns UUIDs. Message events and approval answers identify the sender as <code>@switch-mattermost-…:localhost</code>. They don&#39;t match, so you can&#39;t join them. I match on <code>sender_name</code> for people and on agent names for the crew.</p>
+</blockquote>
+<p>Then post with operations: <code>POST /agents/{id}/ops/post_message</code> with <code>{ body, thread_id }</code>, or <code>send_targeted_message</code> with <code>target_roles: [&quot;reviewer&quot;]</code>. Switch adds the <code>@reviewer</code> for you and delivers the message to whoever holds the role.</p>
+<h2>Step 4: build the room in one call</h2>
+<p><code>create_room</code> takes everything at once: agents, people (by Mattermost username), instructions, and roles.</p>
+<pre><code class="language-js">await ci.op(&quot;create_room&quot;, {
+  name: &quot;fixline-support&quot;, description: &quot;Support reports in, reviewed and approved fixes out.&quot;,
+  agent_names: [&quot;fixline-triage&quot;, &quot;fixline-repro&quot;, &quot;fixline-fixer&quot;, &quot;fixline-reviewer&quot;, &quot;fixline-ci&quot;],
+  user_names: [&quot;priya&quot;, &quot;sam&quot;], channel_type: &quot;channel_public&quot;,
+  instructions: roomInstructions,
+  roles: [&quot;triage&quot;, &quot;repro&quot;, &quot;fixer&quot;, &quot;reviewer&quot;, &quot;ci&quot;].map((name) =&gt; ({ name, instructions: roleText[name], exclusive: true })),
+});
+</code></pre>
+<p>Each agent then calls <code>connect_to_room</code> and <code>assume_role</code>. Room documents come from <code>create_room_document</code>. Only the agent that created a document can update it, so let the agent that owns a document create it: triage owns <code>known-issues</code>, CI owns <code>fix-ledger</code>.</p>
+<p><img src="https://raw.githubusercontent.com/Aryan1982/fixline/main/docs/img/gateway-roles.png" alt="The five roles in the Switch Gateway, each held by its agent"></p>
+<h2>Step 5: let a person press the button</h2>
+<p>This is the part I like best. CI opens a native approval card:</p>
+<pre><code class="language-js">await fetch(`${base}/agent-sessions/${sessionId}/approvals`, { method: &quot;POST&quot;, headers: auth, body: JSON.stringify({
+  request_id: crypto.randomUUID(), turn_id: crypto.randomUUID(), kind: &quot;approval&quot;,
+  title: &quot;Merge FX-1 into main: Refunds come out one cent short&quot;,
+  detail: &quot;3 files changed · tests green · repro locked · reviewed by Codex&quot;,
+  options: [{ id: &quot;allow&quot;, label: &quot;Approve&quot;, decision: &quot;accept&quot; }, { id: &quot;deny&quot;, label: &quot;Decline&quot;, decision: &quot;decline&quot; }],
+  questions: [], room_id: roomId, thread_id: threadId, expires_at: null }) });
+</code></pre>
+<p>Mattermost shows it with buttons and tags the agent&#39;s owner. When someone answers, the card changes to <em>&quot;Approve · Chosen by @priya from Mattermost&quot;</em>. The outcome arrives as an <code>approval_outcome</code> frame, and <code>GET /agent-sessions/approvals/outcomes</code> has it too, in case your socket blinked. <code>answeredBy</code> says who answered, so CI can record the approver in the ledger.</p>
+<blockquote>
+<p><strong>Pitfall 6: a card mentions the owner by username.</strong> The seeded Mattermost account is called <code>user</code>, so my first cards said <em>&quot;@user Permission needed&quot;</em>. Set <code>MATTERMOST_USER=priya</code> in <code>.env</code> before the first <code>up</code>; the setup container creates the account with that name.</p>
+</blockquote>
+<h2>What made the crew trustworthy</h2>
+<p>The models were the easy part. The work went into rules that don&#39;t depend on a model behaving:</p>
+<ul>
+<li><strong>No fix without proof.</strong> CI runs the reproducer&#39;s test and only hands off when it fails.</li>
+<li><strong>The test is locked.</strong> CI records the repro commit in the thread. When the fix comes back, it diffs the branch against that commit, and if the test file changed, the fix is rejected. (Fixers love weakening the test.)</li>
+<li><strong>Different models check each other.</strong> In one run Codex sent a CSV fix back because <code>String(value)</code> turned <code>null</code> cells into the text <code>&quot;null&quot;</code>. Claude Code fixed it on the next pass.</li>
+<li><strong>The thread is the ticket.</strong> No agent keeps ticket state in memory. Each one rebuilds the ticket by calling <code>read_context</code> on its thread, so a person reading the same thread sees exactly what the agents saw.</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/Aryan1982/fixline/main/site/img/repro.png" alt="CI confirms the bug and locks the repro test"></p>
+<h2>Try it</h2>
+<pre><code class="language-sh">git clone https://github.com/Aryan1982/fixline &amp;&amp; cd fixline
+make up &amp;&amp; make setup &amp;&amp; make crew
+make demo          # in another terminal: Sam reports two problems, Priya approves
+</code></pre>
+<p>You need Docker, Node 20+, and the Claude Code and Codex CLIs signed in. The README lists every guard rail and where in the code it lives.</p>
+  </main>
+  <footer class="wrap foot"><span>Fixline · built for Flip the Switch</span><a href="/">Home</a></footer>
+</body>
+</html>
