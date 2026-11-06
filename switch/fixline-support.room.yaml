@@ -1,0 +1,94 @@
+# The fixline-support room as Switch exports it (Gateway → Rooms → Export to YAML,
+# or GET /gateway/rooms/{id}/yaml), captured after a real run. It is the format
+# POST /gateway/rooms/from-yaml accepts.
+room:
+  name: fixline-support
+  description: Support reports in, reviewed and approved fixes out.
+  instructions: |
+    This is the Fixline support room. People from support report customer
+    problems here in plain English; a crew of agents turns each real bug into a
+    reviewed, human-approved fix and reports back.
+
+    How work moves:
+    1. Every report goes to @triage first. Triage checks the `known-issues`
+       document, asks at most one question, and files a ticket (FX-n) for a new bug.
+    2. @repro writes a failing test that proves the bug.
+    3. @ci confirms the test fails, then locks it.
+    4. @fixer fixes the code until the whole suite passes, without touching the
+       locked test.
+    5. @reviewer (a different model from the fixer) reviews the diff.
+    6. @ci asks the engineering lead to approve the merge. Nothing merges without
+       a person pressing Approve.
+    7. @triage tells the reporter what happened, with a reply they can send the
+       customer.
+
+    Each ticket lives in one thread. Hand-offs are addressed to roles, not to
+    agents, so whoever holds a role picks the work up. Every merge is recorded in
+    the `fix-ledger` document.
+  bridge: Mattermost
+  channel_type: channel_public
+  read_visibility: public
+  write_visibility: public
+  agents:
+  - fixline-ci
+  - fixline-fixer
+  - fixline-repro
+  - fixline-reviewer
+  - fixline-triage
+  users:
+  - priya
+  - sam
+  - switch-admin
+  roles:
+  - name: ci
+    instructions: Run tests, enforce the repro lock, and ask the engineering lead
+      to approve each merge. Record merges in fix-ledger.
+    exclusive: true
+  - name: fixer
+    instructions: Fix the root cause in src/ until the whole suite passes. Never edit
+      the locked repro test. Hand it to @ci.
+    exclusive: true
+  - name: repro
+    instructions: Write one failing test that proves the ticket's bug, on the ticket's
+      branch. Never touch src/. Hand it to @ci.
+    exclusive: true
+  - name: reviewer
+    instructions: Review the fix diff as a second model. Request changes from @fixer
+      only for real defects; otherwise approve to @ci.
+    exclusive: true
+  - name: triage
+    instructions: First stop for every report. Check known-issues, ask at most one
+      question, file FX tickets for new bugs and hand them to @repro. When @ci reports
+      a merge, tell the reporter and draft a customer reply.
+    exclusive: true
+  docs:
+  - name: known-issues
+    description: Issues already tracked, with customer workarounds
+    instructions: Check every report against this before filing a ticket.
+    content: |
+      # Known issues
+
+      Issues the team already tracks. Triage checks every report against this list
+      before filing a new ticket.
+
+      ## KI-2 · Discount codes are case-sensitive
+      - **Symptom:** a customer types `save10` (lower case) at checkout and is told the code is invalid.
+      - **Status:** fix scheduled for the 1.5 release.
+      - **Customer workaround:** enter the code in capitals, `SAVE10`. Support can also apply the discount manually.
+
+      ## KI-3 · Order confirmation e-mails can arrive up to 10 minutes late
+      - **Symptom:** the customer pays, sees the confirmation page, but the e-mail is slow.
+      - **Status:** upstream e-mail provider queueing; not a shopkit bug.
+      - **Customer workaround:** the order is placed; the confirmation page is the receipt.
+  - name: fix-ledger
+    description: Every merge the crew made and who approved it
+    instructions: Append one row per merge. Read it to answer what changed and who
+      approved it.
+    content: |
+      # Fix ledger
+
+      Every merge the crew makes, with who approved it. Written by @ci.
+
+      | Ticket | Fix | Merge commit | Approved by | Report → merge | Human touches |
+      |---|---|---|---|---|---|
+      | FX-1 | Refund total is sometimes one cent short | `b8056fa` | @priya | 3.2 min | 2 |
