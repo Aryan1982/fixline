@@ -3,22 +3,22 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Fixline: support reports in, approved fixes out</title>
-  <meta name="description" content="Claude Code and Codex in your support channel, coordinated by Switch. They reproduce, fix and review each customer bug; a person approves every merge.">
-  <meta property="og:title" content="Fixline: support reports in, approved fixes out">
-  <meta property="og:description" content="A customer complaint typed in chat became a tested, reviewed, approved merge in 3.2 minutes. Built on Switch.">
+  <title>Fixline: customer complaint to merged fix in 3 minutes</title>
+  <meta name="description" content="An AI bug-fixing crew in your support channel. Claude Code fixes, Codex reviews, your engineering lead presses Approve. Built on Switch, open source.">
+  <meta property="og:title" content="Fixline: customer complaint to merged fix in 3 minutes">
+  <meta property="og:description" content="Support types the problem in chat. Five agents reproduce, fix and review it. A person approves. Built on Switch.">
   <meta property="og:image" content="https://fixline-iota.vercel.app/img/og.png">
   <meta property="og:type" content="website">
   <meta name="twitter:card" content="summary_large_image">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%230a0a0a'/><path d='M9 17l5 5 9-12' stroke='%23ff5a1f' stroke-width='3.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%23111'/><path d='M9 17l5 5 9-12' stroke='%23ff5b24' stroke-width='3.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>">
   <link rel="stylesheet" href="/style.css">
 </head>
 <body>
   <header class="nav wrap">
-    <a class="brand" href="/">Fixline</a>
+    <a class="brand" href="/"><span class="mark" aria-hidden="true"></span>Fixline</a>
     <nav>
-      <a href="#demo">Demo</a>
-      <a href="#how">How it works</a>
+      <a href="#run">The 3-minute run</a>
+      <a href="#trust">Why trust it</a>
       <a href="/blog/">Build notes</a>
       <a class="nav-cta" href="https://github.com/Aryan1982/fixline">GitHub</a>
     </nav>
@@ -26,20 +26,84 @@
 
   <main>
     <section class="hero wrap">
-      <p class="eyebrow">Built on Switch · Flip the Switch hackathon</p>
-      <h1>Support reports in.<br>Approved fixes out.</h1>
-      <p class="lede">Fixline puts Claude Code and Codex in your support channel. They reproduce, fix and review each customer bug, and nothing merges until a person presses Approve.</p>
-      <div class="cta-row">
-        <a class="btn" href="https://github.com/Aryan1982/fixline" data-cta="hero">Get Fixline on GitHub, free</a>
-        <a class="link" href="#demo">Watch the 60-second run →</a>
+      <div class="hero-copy">
+        <p class="eyebrow"><span class="dot"></span>Built on Switch · open source</p>
+        <h1>The customer complains. The fix ships. You press Approve.</h1>
+        <p class="lede">Fixline is an AI bug-fixing crew that lives in your support channel. Support describes the problem in plain English; Claude Code and Codex reproduce it, fix it and check each other's work. Nothing merges until your engineering lead says yes.</p>
+        <div class="cta-row">
+          <a class="btn" href="https://github.com/Aryan1982/fixline">Get Fixline on GitHub, free</a>
+          <a class="link" href="#demo">Watch a real run ↓</a>
+        </div>
+        <p class="trust">MIT licensed · runs on your laptop · Mattermost included, no Slack admin needed</p>
       </div>
-      <p class="trust">MIT licensed · runs on your laptop · <code>make up</code> · <code>make setup</code> · <code>make crew</code></p>
+
+      <div class="chat" aria-label="Excerpt from a real Fixline run">
+        <div class="chat-head"><span># fixline-support</span><span class="live">real run · 13:20</span></div>
+        <div class="msg">
+          <span class="av av-sam">S</span>
+          <div><b>Sam Rivera</b> <i>Support</i>
+            <p>A customer returned 2 stoneware mugs at $19.99 each. Her refund says $39.97 but she paid $39.98. Can someone check?</p></div>
+        </div>
+        <div class="msg">
+          <span class="av av-bot">T</span>
+          <div><b>Triage</b> <i>Claude Code</i>
+            <p>Good catch, the customer is right. Our refund math rounds some amounts down by a cent. Filed as <code>FX-1</code>, the crew is on it.</p></div>
+        </div>
+        <div class="msg compact">
+          <span class="av av-bot">C</span>
+          <div><b>CI Gate</b> <i>no AI</i>
+            <p><span class="pill red">Bug reproduced</span> 3997 ≠ 3998 · test locked</p></div>
+        </div>
+        <div class="msg compact">
+          <span class="av av-bot">R</span>
+          <div><b>Reviewer</b> <i>Codex</i>
+            <p><span class="pill green">Approved</span> fix uses integer cents, matches checkout</p></div>
+        </div>
+        <div class="card-approve">
+          <div class="ca-title">Merge FX-1 into main?</div>
+          <div class="ca-meta">3 files · tests green · repro locked · reviewed by Codex</div>
+          <div class="ca-row"><span class="ca-btn on">Approve</span><span class="ca-btn">Decline</span><span class="ca-by">Chosen by @priya</span></div>
+        </div>
+        <div class="msg compact">
+          <span class="av av-bot">C</span>
+          <div><b>CI Gate</b>
+            <p><span class="pill dark">Merged</span> report to merge <b>3.2 min</b> · 2 human actions</p></div>
+        </div>
+      </div>
     </section>
 
     <section class="proof wrap" aria-label="Measured results">
-      <div><strong>3.2 min</strong><span>from Sam's complaint to a merged fix, in a real run</span></div>
-      <div><strong>1 approval</strong><span>the only thing the engineering lead had to do</span></div>
-      <div><strong>0 tickets</strong><span>for a duplicate: triage answered from the known-issues doc</span></div>
+      <div><strong>3.2 min</strong><span>customer complaint to merged fix, measured in a real run</span></div>
+      <div><strong>2 actions</strong><span>by people: Sam's report and Priya's Approve. Agents did the rest</span></div>
+      <div><strong>2 models</strong><span>Claude Code writes the fix, Codex reviews it. Nobody grades their own work</span></div>
+      <div><strong>0 tickets</strong><span>for a known issue: support gets the workaround straight from the shared doc</span></div>
+    </section>
+
+    <section class="compare wrap">
+      <h2>Every customer bug costs your team an afternoon.<br><span class="muted">It doesn't have to.</span></h2>
+      <div class="cols">
+        <div class="col before">
+          <h3>Today</h3>
+          <ol>
+            <li>Support retells the complaint in a ticket</li>
+            <li>It waits in a queue for an engineer</li>
+            <li>The engineer reproduces it, fixes it, asks for review</li>
+            <li>The reviewer gets to it tomorrow</li>
+            <li>Support finds out it's fixed… eventually</li>
+          </ol>
+          <p class="foot-note">Hours to days, and four context switches.</p>
+        </div>
+        <div class="col after">
+          <h3>With Fixline</h3>
+          <ol>
+            <li>Support types the problem in the channel</li>
+            <li>The crew files, reproduces, fixes and reviews it</li>
+            <li>Your lead presses <b>Approve</b></li>
+            <li>Support gets a reply to send the customer</li>
+          </ol>
+          <p class="foot-note">Minutes, and one decision for engineering.</p>
+        </div>
+      </div>
     </section>
 
     <section id="demo" class="demo wrap">
@@ -48,86 +112,123 @@
           <source src="/media/demo-4x.mp4" type="video/mp4">
         </video>
       </div>
-      <p class="caption">A real, unedited run at 4× speed. Sam reports a refund that came out a cent short. The crew files FX-1, proves the bug, fixes it, reviews it, and waits for Priya. Sam tries to approve too; Switch ignores him.</p>
+      <p class="caption">Unedited screen recording at 4× speed. Nothing is staged: the agents found, fixed and reviewed the bug live.</p>
     </section>
 
-    <section id="how" class="how wrap">
-      <h2>Three steps, and only two of them are yours</h2>
-      <ol class="steps">
-        <li><span>01</span><h3>Type the complaint</h3><p>Sam from support writes in plain English, with no @-mention. Triage is the room's main agent, so every message reaches it.</p></li>
-        <li><span>02</span><h3>Watch the crew hand off</h3><p>Repro, CI, Fixer and Reviewer pass the ticket along in one thread, each addressed by its Switch room role.</p></li>
-        <li><span>03</span><h3>Press Approve</h3><p>The engineering lead gets a Switch approval card. One click merges; triage tells support what to say to the customer.</p></li>
+    <section id="run" class="run wrap">
+      <div class="run-head">
+        <h2>One real run, minute by minute</h2>
+        <p>Timestamps straight from the chat thread for ticket FX-1. Report at 13:20:07, merged at 13:23:14.</p>
+      </div>
+      <ol class="timeline">
+        <li><time>13:20:07</time><b>Sam (support)</b><span>Reports the missing cent in plain English. No @-mention, no form.</span></li>
+        <li><time>13:21:26</time><b>Triage · Claude Code</b><span>Finds the bug in the refund code, files FX-1, tells Sam it's being handled.</span></li>
+        <li><time>13:21:50</time><b>Repro · Codex</b><span>Writes a test that fails exactly like the customer's refund did.</span></li>
+        <li><time>13:21:50</time><b>CI Gate</b><span>Confirms the failure and locks the test so it can't be weakened later.</span></li>
+        <li><time>13:22:42</time><b>Fixer · Claude Code</b><span>Fixes the root cause. All 10 tests pass.</span></li>
+        <li><time>13:23:00</time><b>Reviewer · Codex</b><span>A different AI reviews the change and approves it.</span></li>
+        <li class="human"><time>13:23:11</time><b>Priya (eng lead)</b><span>Presses Approve. Sam had tried first; Switch ignored him.</span></li>
+        <li><time>13:23:14</time><b>CI Gate</b><span>Merges and logs it in the team's fix ledger.</span></li>
+        <li><time>13:23:29</time><b>Triage</b><span>Explains the fix to Sam and drafts a reply for the customer.</span></li>
       </ol>
     </section>
 
-    <section class="features wrap">
-      <article class="feature">
-        <div class="copy">
-          <h3>Triage files a ticket a developer could act on</h3>
-          <p>Claude Code reads the code, finds the line responsible, and writes up the expected and actual numbers. Duplicates never get this far: triage checks the room's <code>known-issues</code> document first and replies with the workaround.</p>
-        </div>
-        <img class="frame" src="/img/triage.png" width="1125" height="530" alt="Triage replies to Sam and files FX-1 with summary, steps, expected, actual and suspected code" loading="lazy">
-      </article>
+    <section id="trust" class="trust-sec wrap">
+      <h2>Fast is easy. Trustworthy is the point.</h2>
+      <p class="sub">AI that ships code needs rules it can't talk its way around. Fixline enforces four.</p>
+      <div class="rules">
+        <article>
+          <span class="num">01</span>
+          <h3>No fix without proof</h3>
+          <p>The bug must be reproduced by a failing test before anyone touches the code.</p>
+        </article>
+        <article>
+          <span class="num">02</span>
+          <h3>The proof can't be edited</h3>
+          <p>Once confirmed, the test is locked. A fix that changes it is rejected automatically.</p>
+        </article>
+        <article>
+          <span class="num">03</span>
+          <h3>A second AI reviews</h3>
+          <p>Codex reviews what Claude Code wrote. In one run it caught a regression and sent the fix back.</p>
+        </article>
+        <article>
+          <span class="num">04</span>
+          <h3>A person approves</h3>
+          <p>Only the engineering lead can press Approve. Switch enforces it, not a promise in a prompt.</p>
+        </article>
+      </div>
+      <div class="shots">
+        <figure><img class="frame" src="/img/repro.png" width="1125" height="215" alt="CI confirms the bug and locks the test" loading="lazy"><figcaption>The bug, proven and locked</figcaption></figure>
+        <figure><img class="frame" src="/img/approve.png" width="1125" height="405" alt="Approval chosen by Priya, merged in 3.7 minutes" loading="lazy"><figcaption>Only Priya's approval counts</figcaption></figure>
+      </div>
+    </section>
 
-      <article class="feature flip">
-        <div class="copy">
-          <h3>No fix without a failing test, and the test is locked</h3>
-          <p>Codex writes the reproduction. CI, which is plain code with no model, watches it fail and records the commit. If the fixer edits that test later, CI rejects the fix.</p>
-        </div>
-        <img class="frame" src="/img/repro.png" width="1125" height="215" alt="CI Gate confirms the bug: 3997 !== 3998, and locks the repro test" loading="lazy">
-      </article>
+    <section class="support wrap">
+      <div class="copy">
+        <h2>Support finally hears how it ended</h2>
+        <p>Every ticket closes with a plain-English explanation for the support person and a ready-to-send reply for the customer. Repeat complaints don't become tickets at all: triage answers them from the team's known-issues document in seconds.</p>
+      </div>
+      <img class="frame" src="/img/customer.png" width="1125" height="315" alt="Triage explains the fix to Sam and drafts a customer reply" loading="lazy">
+    </section>
 
-      <article class="feature">
-        <div class="copy">
-          <h3>A different model reviews, and a person approves</h3>
-          <p>Code written by Claude Code is reviewed by Codex. In one run Codex sent a CSV fix back for turning empty cells into the text "null". Then CI raises a native Switch approval card that only the lead's answer can close.</p>
-        </div>
-        <img class="frame" src="/img/approve.png" width="1125" height="405" alt="Approval card chosen by Priya Shah; Sam's answer ignored; merged in 3.7 minutes" loading="lazy">
-      </article>
-
-      <article class="feature flip">
-        <div class="copy">
-          <h3>Support hears how it ended</h3>
-          <p>Triage explains the bug to Sam in plain words and drafts a reply he can paste to the customer. Every merge goes into the <code>fix-ledger</code> room document, with the time it took and who approved it.</p>
-        </div>
-        <img class="frame" src="/img/customer.png" width="1125" height="315" alt="Triage tells Sam what went wrong and drafts a customer reply" loading="lazy">
-      </article>
+    <section class="results wrap">
+      <h2>Results across runs</h2>
+      <div class="table">
+        <div class="tr th"><span>Customer report</span><span>Report → merge</span><span>Reviews</span></div>
+        <div class="tr"><span>Refund came out a cent short</span><span>3.2 / 3.6 / 3.7 min</span><span>Approved first time</span></div>
+        <div class="tr"><span>CSV export breaks on "Socks, wool"</span><span>6.9 min</span><span>Sent back once, then approved</span></div>
+        <div class="tr"><span>"save10 doesn't work"</span><span>No ticket</span><span>Answered from known issues</span></div>
+      </div>
     </section>
 
     <section class="switch wrap">
-      <div class="copy narrow">
-        <h2>Switch is the whole wiring</h2>
-        <p>Every hand-off is a Switch message addressed to a room role. No agent keeps ticket state in memory; each one rebuilds the ticket by reading its thread. The room carries the roles, the instructions, both documents, the approval cards and the rule that only the lead may approve.</p>
+      <div class="copy">
+        <p class="eyebrow">Powered by Switch</p>
+        <h2>Agents that work like teammates</h2>
+        <p>Switch turns a chat channel into a shared workspace for people and AI agents. Fixline uses it for everything that makes the crew a team:</p>
         <ul class="facts">
-          <li><b>Roles</b> triage, repro, fixer, reviewer and ci, each held by one agent</li>
-          <li><b>Main agent</b> so support never types an @-mention</li>
-          <li><b>Room documents</b> known-issues for dedup, fix-ledger for the audit trail</li>
-          <li><b>Approval cards</b> plus an owner-only addressing policy on @ci</li>
-          <li><b>Agent protocol</b> all five agents are WebSocket + HTTP clients</li>
+          <li><b>Roles</b><span>Work goes to "whoever reviews", so you can swap an agent without changing the process</span></li>
+          <li><b>One thread per issue</b><span>The conversation is the ticket; anyone can read exactly what happened</span></li>
+          <li><b>Shared documents</b><span>Known issues and a fix ledger every agent and person can see</span></li>
+          <li><b>Approval buttons</b><span>A recorded yes or no in the chat your team already uses</span></li>
         </ul>
       </div>
-      <img class="frame" src="/img/roles.png" width="2880" height="1576" alt="Roles in the Switch Gateway, each held by its Fixline agent" loading="lazy">
+      <img class="frame" src="/img/roles.png" width="2880" height="1576" alt="The five Fixline roles in the Switch Gateway" loading="lazy">
+    </section>
+
+    <section class="setup wrap">
+      <h2>Running in three commands</h2>
+      <div class="term" role="img" aria-label="Terminal: make up, make setup, make crew">
+        <div class="term-bar"><i></i><i></i><i></i></div>
+<pre><span class="c">$</span> make up      <span class="cm"># Switch + Mattermost in Docker</span>
+<span class="c">$</span> make setup   <span class="cm"># 5 agents, the room, roles and docs (~30 s)</span>
+<span class="c">$</span> make crew    <span class="cm"># the crew goes to work</span></pre>
+      </div>
+      <p class="sub">Needs Docker, Node 20+, and the Claude Code and Codex CLIs you already use.</p>
     </section>
 
     <section class="faq wrap">
       <h2>Questions</h2>
-      <details><summary>Do I need Slack or a company workspace?</summary><p>No. The stack includes Mattermost, so everything runs on your laptop. Switch also bridges Slack, Teams, Discord and Telegram; Fixline was tested on Mattermost.</p></details>
-      <details><summary>Which agents does it use?</summary><p>The Claude Code and Codex CLIs you already have, run headless inside a separate git worktree for each ticket. The CI gate is ordinary code.</p></details>
-      <details><summary>Where does my code go?</summary><p>To Anthropic and OpenAI through their own CLIs, exactly as when you use them in a terminal. Switch, Mattermost and git all run locally in Docker and on your disk.</p></details>
-      <details><summary>What if a fix is wrong?</summary><p>It has to pass the locked repro test and the whole suite, then a second model's review. After that the lead can press Decline, and the branch is parked instead of merged.</p></details>
-      <details><summary>How long does setup take?</summary><p>One <code>make up</code> (the first run pulls images), one <code>make setup</code> (about 30 seconds), then <code>make crew</code>. You need Docker, Node 20+ and both CLIs signed in.</p></details>
+      <details><summary>Do I need Slack or a company workspace?</summary><p>No. Mattermost comes bundled, so everything runs on your laptop. Switch also connects to Slack, Teams, Discord and Telegram; Fixline was tested on Mattermost.</p></details>
+      <details><summary>What if the AI gets the fix wrong?</summary><p>It has to pass the locked test and the whole test suite, then a review by a different model. If your lead still isn't happy, they press Decline and nothing is merged.</p></details>
+      <details><summary>Can support accidentally ship code?</summary><p>No. Only the engineering lead's approval counts. In every test run support tried to approve first, and Switch ignored it.</p></details>
+      <details><summary>Where does my code go?</summary><p>To Anthropic and OpenAI through their own CLIs, exactly as when you use them in a terminal. Switch, the chat and git all run locally.</p></details>
+      <details><summary>What does it cost?</summary><p>Fixline and Switch are free and open source. You use your existing Claude Code and Codex subscriptions.</p></details>
     </section>
 
     <section class="final wrap">
-      <h2>Give your support channel a crew.</h2>
-      <a class="btn" href="https://github.com/Aryan1982/fixline" data-cta="footer">Get Fixline on GitHub, free</a>
-      <p class="trust">Open source under MIT. Built on <a href="https://github.com/sandbox-quantum/switch">Switch</a>.</p>
+      <div class="final-card">
+        <h2>Give your support channel a crew.</h2>
+        <p>Customer complaint in. Reviewed, approved fix out.</p>
+        <a class="btn light" href="https://github.com/Aryan1982/fixline">Get Fixline on GitHub, free</a>
+      </div>
     </section>
   </main>
 
   <footer class="wrap foot">
     <span>Fixline · built for Flip the Switch by WeMakeDevs × DevTools Academy</span>
-    <a href="/blog/">Build notes</a>
+    <span><a href="/blog/">Build notes</a> · <a href="https://github.com/Aryan1982/fixline">GitHub</a> · <a href="https://github.com/sandbox-quantum/switch">Switch</a></span>
   </footer>
 </body>
 </html>
