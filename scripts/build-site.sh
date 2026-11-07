@@ -16,13 +16,14 @@ cat > "$root/site/blog/index.html" <<HTML
   <title>Claude Code and Codex in a support channel, checking each other's work</title>
   <meta name="description" content="How Fixline was built on Switch's agent protocol: rooms, roles, approval cards, addressing policies, and six pitfalls for first-time Switch users.">
   <meta property="og:image" content="https://fixline-iota.vercel.app/img/og.png">
+  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@600;700;800\&family=Inter:wght@400;500;600;700\&family=JetBrains+Mono:wght@500;600\&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/style.css">
 </head>
 <body>
-  <header class="nav wrap">
-    <a class="brand" href="/">Fixline</a>
-    <nav><a href="/#demo">Demo</a><a class="nav-cta" href="${repo}">GitHub</a></nav>
-  </header>
+  <header class="nav"><div class="wrap nav-in">
+    <a class="brand" href="/"><span class="mark" aria-hidden="true"></span>Fixline</a>
+    <nav><a href="/#run">A real run</a><a class="nav-cta" href="${repo}">Star on GitHub</a></nav>
+  </div></header>
   <main class="wrap post">
 ${body}
   </main>
