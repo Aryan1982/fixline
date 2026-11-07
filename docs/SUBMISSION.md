@@ -5,7 +5,7 @@ Answers for each field of https://www.wemakedevs.org/hackathons/switch/submit, r
 ## Part 1: Project details
 
 **Project title**
-Fixline: support reports in, approved fixes out
+Support reports the bug, and it gets fixed by agents
 
 **Tracks**
 Best Business Workflow
@@ -19,7 +19,7 @@ In real runs, report to merge took 3.2 to 3.7 minutes for a refund rounding bug.
 https://github.com/Aryan1982/fixline
 
 **Demo video**
-https://fixline-iota.vercel.app/media/demo-4x.mp4 (a real run at 4× speed; replace with the narrated YouTube or Loom link once it's recorded)
+https://www.youtube.com/watch?v=TnHHsiQtK2s
 
 **Live demo or deployment**
 https://fixline-iota.vercel.app
@@ -29,7 +29,7 @@ https://fixline-iota.vercel.app
 **Pull requests**: none (not entering Best Core Contribution)
 
 **Blog post**
-https://fixline-iota.vercel.app/blog/ for now. The Medium draft is at https://medium.com/p/300fe546b3a1/edit; publish it and paste its public URL here instead.
+https://medium.com/@AryanThakor/i-put-claude-code-and-codex-in-a-support-channel-and-made-them-check-each-others-work-300fe546b3a1
 
 **Images**: `site/img/og.png`, `docs/img/thread-full.png`, `site/img/approve.png`, `docs/img/gateway-roles.png`
 
