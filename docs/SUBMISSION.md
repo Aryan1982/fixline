@@ -40,18 +40,27 @@ https://fixline-iota.vercel.app/blog/ for now. The Medium draft is at https://me
 ## Part 3: How you used Switch
 
 **How did you use Switch in your project?**
-Switch is the only thing connecting the agents. One Mattermost channel is a Switch room created with `create_room`. The room carries the instructions, two people (support and the engineering lead), five agents, and five exclusive roles: triage, repro, fixer, reviewer and ci. Each agent is a client of the agent protocol. It registers with `POST /agents`, holds a WebSocket (ping/pong, resume from cursor), calls `connect_to_room` and `assume_role`, and acts only on addressed messages.
+Switch is what turns five separate AI tools into one team that works inside the support channel.
 
-Every hand-off is `send_targeted_message` to a role in the ticket's thread. No agent keeps ticket state in memory. Each one rebuilds the ticket with `read_context` on its thread, so a person reading the thread sees exactly what the agents saw. `!assign-agent` makes triage the main agent, so support never types an @-mention. Two room documents do real work: `known-issues` stops duplicates, and `fix-ledger` is the audit trail that CI updates with `update_room_document`.
+Without Fixline, a support person files a ticket, waits for an engineer, and rarely hears how it ended. With Switch, the support channel itself becomes the workplace. Sam from support describes the customer's problem in plain English, and the crew takes it from there.
 
-Merges go through Switch approval cards (`/agent-sessions/{id}/approvals`). The CI agent has an owner-only addressing policy, so Switch itself refuses approvals from anyone but the lead. In every test run, support tried to approve and was ignored. Claude Code and Codex run headless inside a git worktree for each ticket. The CI gate has no model at all.
+- Everyone works in one room. Support, the engineering lead and five AI agents (two Claude Code, two Codex, and one automated quality check) share a single chat channel. Each agent appears with its own name, like a colleague.
+- Agents hold jobs, not scripts. With Switch roles (triage, reproduce, fix, review, quality check), work goes to "whoever does reviews". The team can swap in a different agent without changing the process.
+- One thread per customer issue. The conversation is the ticket, so anyone can scroll it and see what was found, fixed and decided.
+- Shared team knowledge. A known-issues document in the room means a repeat complaint gets the existing workaround instead of a new ticket. A fix log records every change, how long it took, and who approved it.
+- People stay in control. Nothing goes live until the engineering lead presses Approve in the chat, and Switch enforces who may approve. When support tried to approve in our tests, Switch ignored it.
+
+The result: in our runs, a customer's refund complaint became a reviewed, approved fix in about 3 minutes. It took two human actions, the report and the approval.
 
 **What did you like about Switch, and what would you improve?**
-Liked: Roles made the design simple. Agents address a job, not each other, and `!roles` shows who holds what. Approval cards are excellent: real buttons in chat, the answerer recorded, the outcome delivered over the socket, and addressing policies deciding who may answer. Treating rooms as logs with `read_context` let the thread be the ticket. Export to YAML in the Gateway is a nice touch.
+What we liked:
+- Agents feel like teammates, not bots. They join the chat with names and jobs, so people outside engineering can work with them without learning anything new.
+- Roles make the process clear. You assign jobs instead of tools, and you can see who holds each job at any time.
+- The built-in approval button is the standout feature. Leaders get a simple, recorded yes or no in the chat they already use, and Switch remembers who said yes.
+- Shared documents in the room give every person and agent the same context.
 
-Would improve:
-1. The agent-protocol docs say an agent can call `update_agent_detail` to change its own addressing; on 0.31.0 that returns 403, and the owner has to use `PUT /gateway/agents/{id}/addressing-policy`.
-2. On a self-hosted server, `!assign-agent` and follow-ups need `FEATURE_FLAGS_ENABLED=follow_the_conversation`. Without it the command did nothing visible in our run; the setting should be in the quickstart.
-3. The bundled Mattermost image is amd64-only. On Apple Silicon under Colima's QEMU it crashed within minutes; a native arm64 build from Mattermost's linux-arm64 tarball fixed it.
-4. `list_participants` returns UUIDs, while message senders and approval `answeredBy` use `@switch-…:server` ids, so the two can't be joined.
-5. Sending `X-Switch-Connection-Id` before the socket is open gives a 409. A small official JavaScript and Python client would remove most of this friction.
+What we'd improve:
+- Getting started on a laptop had rough edges. The bundled chat app crashed on Apple Silicon Macs, and talking to an agent without @-mentioning it has to be switched on separately on a self-hosted server, which the quickstart doesn't mention.
+- A few docs pages didn't match the released version, which cost us time.
+- An official starter kit for building your own agent would make Switch much easier for teams that bring custom agents.
+- A simple per-room summary of work done and approvals given would help teams show the value to their managers.
